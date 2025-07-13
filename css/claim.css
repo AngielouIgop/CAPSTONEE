@@ -1,0 +1,109 @@
+body {
+  background: #bfc8e6;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.rewards-header {
+  background: #fbeeee;
+  border-radius: 12px 12px 0 0;
+  padding: 20px 30px 10px 30px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 900px;
+  margin: 30px auto 0 auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.rewards-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: flex-start;
+  background: #fbeeee;
+  border-radius: 0 0 12px 12px;
+  max-width: 900px;
+  margin: 0 auto 40px auto;
+  padding: 40px 30px 30px 30px;
+  min-height: 400px;
+}
+
+.reward-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  width: 170px;
+  min-height: 220px;
+  padding: 1.2rem 1rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s, border 0.2s;
+  position: relative;
+}
+
+.reward-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 0.7rem;
+  border-radius: 8px;
+  background: #f0f0f0;
+}
+
+.reward-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.2rem;
+  text-align: center;
+}
+
+.reward-points {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.7rem;
+}
+
+.claim-btn {
+  background: #e0e0e0;
+  color: #222;
+  border: none;
+  border-radius: 12px;
+  padding: 0.4em 1.2em;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.2rem;
+  transition: background 0.2s;
+}
+
+.claim-btn.available {
+  background: #2336b6;
+  color: #fff;
+}
+
+.claim-btn.available:hover {
+  background: #1a237e;
+}
+
+.claim-btn.insufficient {
+  background: #e0e0e0;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.reward-card.coming-soon {
+  opacity: 0.5;
+  background: #f0f0f0;
+  border: 2px dashed #ccc;
+}
+
+.reward-card.coming-soon .reward-name {
+  color: #aaa;
+  font-style: italic;
+}
