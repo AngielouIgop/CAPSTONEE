@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 class endpoint {
     // Include the model file
     public $model = null;
@@ -9,6 +11,24 @@ class endpoint {
     }
 
     public function processRequest() {
+        //getting the userID
+        if($_SERVER['REQUEST_METHOD'] ==='GET') {
+            header('Content-Type: application/json');
+
+            if(!isset($_SESSION['userID'])){
+                http_response_code(401);
+                echo json_encode(['error' => 'User not logged in']);
+                exit;
+            }
+
+            echo json_encode([
+                'userID'=> $_SESSION['userID'],
+                'username' => $_SESSION['username'] ?? 'Unknown'
+            ]);
+            exit;
+        }
+
+
         // Debug incoming request
         error_log("=== New Request ===");
         error_log("POST data: " . print_r($_POST, true));
