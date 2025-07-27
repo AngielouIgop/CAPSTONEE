@@ -1,5 +1,6 @@
 <?php
 session_start();
+echo session_id();
 
 class endpoint {
     // Include the model file
@@ -33,14 +34,6 @@ class endpoint {
         error_log("=== New Request ===");
         error_log("POST data: " . print_r($_POST, true));
         
-        // Database connection
-        $conn = new mysqli("localhost", "root", "", "capstone");
-        if ($conn->connect_error) {
-            error_log("Database connection failed: " . $conn->connect_error);
-            die("Connection failed: " . $conn->connect_error);
-        }
-        error_log("Database connected successfully");
-
         // Get POST data with null coalescing operator
         $material = $_POST['material'] ?? '';
         $sensor_value = $_POST['sensor_value'] ?? '';
@@ -64,9 +57,9 @@ class endpoint {
 
         try {
             // Check if userID exists in the user table
-            $userCheck = $conn->prepare("SELECT userID FROM user WHERE userID = ?");
+            $userCheck = $this->model->db->prepare("SELECT userID FROM user WHERE userID = ?");
             if (!$userCheck) {
-                throw new Exception("Error preparing user check statement: " . $conn->error);
+                throw new Exception("Error preparing user check statement: " . $this->model->db->error);
             }
             
             $userCheck->bind_param("i", $userID);
@@ -77,9 +70,9 @@ class endpoint {
             if ($userCheckResult && $userCheckResult->num_rows > 0) {
                 // Get materialID and pointsPerItem based on the material type
                 $materialQuery = "SELECT materialID, pointsPerItem FROM materialType WHERE materialName = ?";
-                $materialStmt = $conn->prepare($materialQuery);
+                $materialStmt = $this->model->db->prepare($materialQuery);
                 if (!$materialStmt) {
-                    throw new Exception("Error preparing material statement: " . $conn->error);
+                    throw new Exception("Error preparing material statement: " . $this->model->db->error);
                 }
                 
                 $materialStmt->bind_param("s", $material);
@@ -100,9 +93,9 @@ class endpoint {
                     // Insert waste entry
                     $sql = "INSERT INTO wasteEntry (userID, materialID, quantity, pointsEarned, dateDeposited, timeDeposited)
                             VALUES (?, ?, ?, ?, ?, ?)";
-                    $stmt = $conn->prepare($sql);
+                    $stmt = $this->model->db->prepare($sql);
                     if (!$stmt) {
-                        throw new Exception("Error preparing waste entry statement: " . $conn->error);
+                        throw new Exception("Error preparing waste entry statement: " . $this->model->db->error);
                     }
 
                     $stmt->bind_param("iiisss", $userID, $materialID, $quantity, $pointsEarned, $dateDeposited, $timeDeposited);
@@ -128,11 +121,7 @@ class endpoint {
             error_log("Error: " . $e->getMessage());
             echo "Error: " . $e->getMessage();
         } finally {
-            // Close database connection
-            if (isset($conn)) {
-                $conn->close();
-                error_log("Database connection closed");
-            }
+            // No need to close $this->db here, as it's managed by the model
         }
     }
 }

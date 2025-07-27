@@ -1,4 +1,5 @@
 <?php
+
 class Controller
 {
     public $model = null;
@@ -30,40 +31,21 @@ class Controller
                 $username = $_POST['username'] ?? '';
                 $password = $_POST['password'] ?? '';
                 $confirm = $_POST['confirm'] ?? '';
-                $registerRole = strtolower($_POST['registerRole'] ?? 'user');
+                $zone = $_POST['zone'] ?? '';
                 $error = '';
 
                 // Common validation
-                if (empty($fullname) || empty($email) || empty($username) || empty($password) || empty($confirm) || empty($contactNumber)) {
+                if (empty($fullname) || empty($email) || empty($username) || empty($password) || empty($confirm) || empty($contactNumber) || empty($zone)) {
                     $error = "Please fill out all the required fields.";
                 } elseif ($password !== $confirm) {
                     $error = "Passwords do not match.";
                 } elseif ($this->model->userExists($username)) {
                     $error = "Username already exists.";
-                } elseif (!in_array($registerRole, ['user', 'admin'])) {
-                    $error = "Invalid role selected.";
                 } else {
-                    // Role-specific validation and data collection
-                    if ($registerRole === 'user') {
-                        $zone = $_POST['zone'] ?? '';
-                        if (empty($zone)) {
-                            $error = "Please enter your zone.";
-                        } else {
-                            $success = $this->model->registerUser($fullname, $email, $zone, $contactNumber, $username, $password, $registerRole);
-                        }
-                    } else { // admin
-                        $position = $_POST['position'] ?? '';
-                        if (empty($position)) {
-                            $error = "Please enter your position.";
-                        } else {
-                            // Pass position as the zone parameter for admin registration
-                            $success = $this->model->registerUser($fullname, $email, $position, $contactNumber, $username, $password, $registerRole);
-                        }
-                    }
+                    $success = $this->model->registerUser($fullname, $email, $zone, $contactNumber, $username, $password, 'user');
 
                     if (isset($success) && $success) {
-                        header("Location: ?command=login");
-                        exit();
+                        echo "<script>alert('Succesfully registered.'); window.location.href='?command=login';</script>";
                     } else {
                         $error = "Registration failed. Please try again.";
                     }
@@ -90,6 +72,11 @@ class Controller
                             // Check if the role matches
                             if ($user['role'] === $loginRole) {
                                 $_SESSION['user'] = $user;
+                                $_SESSION['userID'] = $user['userID'];
+                                $_SESSION['username'] = $user['username'];
+
+                                $this->model->setCurrentUser($user['userID'], $user['username']);
+
                                 if ($loginRole === 'admin') {
                                     header('Location: ?command=adminDashboard');
                                 } else {
@@ -138,6 +125,7 @@ class Controller
                 $userID = $_SESSION['user']['userID'];
                 $users = $this->model->getUserPoints($userID);
                 $totalCurrentPoints = $this->model->getUserPoints($userID);
+                $rewards = $this->model->getAllRewards();
                 include_once('view/claim.php');
                 break;
 
@@ -194,10 +182,10 @@ class Controller
 
                 // Handle profile picture update
                 $profilePicturePath = $currentUser['profilePicture']; // Keep current path by default
-                
+
                 // Check if user wants to remove profile picture
                 $removeProfilePicture = isset($_REQUEST['removeProfilePicture']) && $_REQUEST['removeProfilePicture'] === '1';
-                
+
                 if ($removeProfilePicture) {
                     if ($profilePicturePath && file_exists($profilePicturePath)) {
                         if (unlink($profilePicturePath)) { // deletes file using unlink method
@@ -278,30 +266,228 @@ class Controller
                 break;
 
             case 'manageUser':
+                $users = $this->model->getAllUsers();
+                $admins = $this->model->getAllAdmins();
                 include_once('view/manageUser.php');
                 break;
 
+            case 'updateUserProfile':
+                $userID = $_POST['userID'];
+                $fullName = $_POST['fullname'];
+                $email = $_POST['email'];
+                $zone = $_POST['zone'];
+                $contactNumber = $_POST['contactNumber'];
+                $username = $_POST['username'];
+                $password = $_POST['password'];
+                $confirmPassword = $_POST['confirmPassword'];
+
+                if (!empty($password) && $password !== $confirmPassword) {
+                    echo "<script>alert('Passwords do not match!'); window.location.href='?command=manageUser';</script>";
+                    exit();
+                }
+
+                $hashedPassword = !empty($password) ? password_hash($password, PASSWORD_DEFAULT) : null;
+
+                $result = $this->model->updateUserProfile(
+                    $userID,
+                    $fullName,
+                    $zone,
+                    $email,
+                    $contactNumber,
+                    $username,
+                    $hashedPassword
+                );
+
+                if ($result) {
+                    echo "<script>alert('User profile updated successfully.'); window.location.href='?command=manageUser';</script>";
+                } else {
+                    echo "<script>alert('Failed to update user profile.'); window.location.href='?command=manageUser';</script>";
+                }
+                break;
+
+            case 'deleteUser':
+                $userID = $_REQUEST['userID'];
+                $result = $this->model->deleteUser($userID);
+
+                echo "<script>
+                    alert('" . $result . "');
+                    window.location.href='index.php?command=manageUser';
+                 </script>";
+                break;
+
+            case 'addAdministrator':
+                $fullname = $_POST['fullname'] ?? '';
+                $email = $_POST['email'] ?? '';
+                $contactNumber = $_POST['contactNumber'] ?? '';
+                $username = $_POST['username'] ?? '';
+                $password = $_POST['password'] ?? '';
+                $confirm = $_POST['confirmPassword'] ?? '';
+                $position = $_POST['position'] ?? '';
+                $error = '';
+
+                // Validation for admin fields only
+                if (empty($fullname) || empty($email) || empty($username) || empty($password) || empty($confirm) || empty($contactNumber) || empty($position)) {
+                    $error = "Please fill out all the required fields.";
+                } elseif ($password !== $confirm) {
+                    $error = "Passwords do not match.";
+                } elseif ($this->model->userExists($username)) {
+                    $error = "Username already exists.";
+                } else {
+                    // Register admin (position is passed as the 'zone' parameter)
+                    $success = $this->model->registerUser($fullname, $email, $position, $contactNumber, $username, $password, 'admin');
+                    if ($success) {
+                        echo "<script>alert('Administrator added successfully.'); window.location.href='?command=manageUser';</script>";
+                        exit();
+                    } else {
+                        $error = "Failed to add administrator. Please try again.";
+                    }
+                }
+
+                if ($error) {
+                    echo "<script>alert('$error'); window.location.href='?command=manageUser';</script>";
+                }
+                break;
+
             case 'adminProfile':
-                if(!isset($_SESSION['user'])){
+                if (!isset($_SESSION['user'])) {
                     header('Location: ?command=Login');
                     exit();
                 }
 
                 $userID = $_SESSION['user']['userID'];
                 $admin = $this->model->getUserData($userID);
-                
+
                 include_once('view/adminProfile.php');
                 break;
-                
+
             case 'rewardInventory':
+                if (!isset($_SESSION['user'])) {
+                    header('Location: ?command=Login');
+                }
+                $userID = $_SESSION['user']['userID'];
+                // $users = $this->model->getUserPoints($userID);
+                // $totalCurrentPoints = $this->model->getUserPoints($userID);
+                $rewards = $this->model->getAllRewards();
                 include_once('view/rewardinventory.php');
                 break;
+
+            case 'updateReward':
+                $rewardID = $_POST['rewardID'];
+                $rewardName = $_POST['rewardName'];
+                $availableStock = $_POST['availableStock'];
+                $slotNum = $_POST['slotNum'];
+                $pointsRequired = $_POST['pointsRequired'];
+                $availability = isset($_POST['availability']) ? intval($_POST['availability']) : 1;
+                $imagePath = null;
+
+                // Validate inputs
+                if (empty($rewardName) || empty($pointsRequired) || empty($slotNum) || empty($availableStock)) {
+                    echo "<script>alert('Please fill out all fields.'); window.location.href='?command=rewardInventory';</script>";
+                    exit();
+                }
+
+                // Handle image upload (save file path, not binary)
+                if (!empty($_FILES['rewardImg']['name'])) {
+                    $targetDir = "rewards/";
+                    if (!is_dir($targetDir)) {
+                        mkdir($targetDir, 0777, true);
+                    }
+                    $fileName = uniqid() . '_' . basename($_FILES['rewardImg']['name']);
+                    $imagePath = $targetDir . $fileName;
+                    $imageFileType = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
+                    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+                    $check = getimagesize($_FILES['rewardImg']['tmp_name']);
+
+                    if ($check === false) {
+                        echo "<script>alert('File is not an image.'); window.location.href='?command=rewardInventory';</script>";
+                        exit();
+                    }
+                    if (!in_array($imageFileType, $allowedTypes)) {
+                        echo "<script>alert('Only JPG, JPEG, PNG & GIF files are allowed.'); window.location.href='?command=rewardInventory';</script>";
+                        exit();
+                    }
+                    if (!move_uploaded_file($_FILES['rewardImg']['tmp_name'], $imagePath)) {
+                        echo "<script>alert('Failed to upload image.'); window.location.href='?command=rewardInventory';</script>";
+                        exit();
+                    }
+                }
+
+                // Update reward in the database
+                $result = $this->model->updateReward($rewardName, $pointsRequired, $slotNum, $availableStock, $rewardID, $imagePath, $availability);
+
+                if ($result) {
+                    echo "<script>alert('Reward updated successfully.'); window.location.href='?command=rewardInventory';</script>";
+                } else {
+                    echo "<script>alert('Failed to update reward.'); window.location.href='?command=rewardInventory';</script>";
+                }
+                break;
+
+            case 'addReward':
+                $rewardID = $_POST['rewardID'];
+                $rewardName = $_POST['rewardName'];
+                $availableStock = $_POST['availableStock'];
+                $slotNum = $_POST['slotNum'];
+                $pointsRequired = $_POST['pointsRequired'];
+                $availability = isset($_POST['availability']) ? intval($_POST['availability']) : 1;
+                $imagePath = null;
+
+                // Validate inputs
+                if (empty($rewardName) || empty($pointsRequired) || empty($slotNum) || empty($availableStock)) {
+                    echo "<script>alert('Please fill out all fields.'); window.location.href='?command=rewardInventory';</script>";
+                    exit();
+                }
+
+                // Handle image upload (save file path, not binary)
+                if (!empty($_FILES['rewardImg']['name'])) {
+                    $targetDir = "rewards/";
+                    if (!is_dir($targetDir)) {
+                        mkdir($targetDir, 0777, true);
+                    }
+                    $fileName = uniqid() . '_' . basename($_FILES['rewardImg']['name']);
+                    $imagePath = $targetDir . $fileName;
+                    $imageFileType = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
+                    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+                    $check = getimagesize($_FILES['rewardImg']['tmp_name']);
+
+                    if ($check === false) {
+                        echo "<script>alert('File is not an image.'); window.location.href='?command=rewardInventory';</script>";
+                        exit();
+                    }
+                    if (!in_array($imageFileType, $allowedTypes)) {
+                        echo "<script>alert('Only JPG, JPEG, PNG & GIF files are allowed.'); window.location.href='?command=rewardInventory';</script>";
+                        exit();
+                    }
+                    if (!move_uploaded_file($_FILES['rewardImg']['tmp_name'], $imagePath)) {
+                        echo "<script>alert('Failed to upload image.'); window.location.href='?command=rewardInventory';</script>";
+                        exit();
+                    }
+                }
+
+                // Save reward with image path (or null if no image)
+                $result = $this->model->addReward($rewardName, $pointsRequired, $slotNum, $availableStock, $imagePath, $availability);
+
+                if ($result) {
+                    echo "<script>alert('Reward added successfully.'); window.location.href='?command=rewardInventory';</script>";
+                } else {
+                    echo "<script>alert('Failed to add reward.'); window.location.href='?command=rewardInventory';</script>";
+                }
+                break;
+
+                case 'deleteReward':
+                $rewardID = $_REQUEST['rewardID'];
+                $result = $this->model->deleteReward($rewardID);
+                echo "<script>
+                    alert('" . $result . "');
+                    window.location.href='index.php?command=rewardInventory';
+                 </script>";
+                break;
+
+
             case 'adminReport':
                 include_once('view/adminReport.php');
                 break;
 
             case 'logout':
-                session_start();
                 session_unset();
                 session_destroy();
                 header("Location: ?command=login");

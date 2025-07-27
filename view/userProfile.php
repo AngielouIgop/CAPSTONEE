@@ -1,3 +1,12 @@
+<?php include 'header.php'; ?>
+<?php include 'contribute.php'; ?>
+
+<script>
+  var userID = '<?php echo $_SESSION['user']['userID']; ?>';
+</script>
+<script src="js/contributeModal.js"></script>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,20 +51,43 @@
       <div class="rewards-inner">
         <p class="rewards-title">Available Rewards</p>
         <div class="rewards-list">
-          <?php if (isset($rewards) && !empty($rewards)): ?>
-                          <?php foreach ($rewards as $reward): ?>
-                <div class="reward-card">
-                  <img src="<?php echo !empty($reward['rewardImg']) ? 'data:image/jpeg;base64,' . base64_encode($reward['rewardImg']) : 'images/default-reward.png'; ?>" 
-                       alt="<?php echo htmlspecialchars($reward['rewardName']); ?>">
-                <div class="reward-name"><?php echo htmlspecialchars($reward['rewardName']); ?></div>
-                <div class="reward-points"><?php echo htmlspecialchars($reward['pointsRequired']); ?> points</div>
-                <button class="claim-btn <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? 'available' : 'insufficient'; ?>" 
-                        <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? '' : 'disabled'; ?>>
-                  <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? 'Claim' : 'Insufficient Points'; ?>
-                </button>
-              </div>
-            <?php endforeach; ?>
-          <?php else: ?>
+          <?php
+            $hasAvailable = false;
+            if (isset($rewards) && !empty($rewards)):
+              foreach ($rewards as $reward):
+                if (isset($reward['availability']) && $reward['availability'] == 1): // Only show available rewards
+                  $hasAvailable = true;
+                  // Image logic: use file path if exists, else base64 if binary, else default
+                  if (!empty($reward['rewardImg'])) {
+                    if (file_exists($reward['rewardImg'])) {
+                      $src = $reward['rewardImg'];
+                    } else {
+                      $imgData = base64_encode($reward['rewardImg']);
+                      $src = 'data:image/jpeg;base64,' . $imgData;
+                    }
+                  } else {
+                    $src = 'images/default-reward.png';
+                  }
+          ?>
+            <div class="reward-card">
+              <img src="<?php echo htmlspecialchars($src); ?>" alt="<?php echo htmlspecialchars($reward['rewardName']); ?>">
+              <div class="reward-name"><?php echo htmlspecialchars($reward['rewardName']); ?></div>
+              <div class="reward-points"><?php echo htmlspecialchars($reward['pointsRequired']); ?> points</div>
+              <button class="claim-btn <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? 'available' : 'insufficient'; ?>"
+                      <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? '' : 'disabled'; ?>>
+                <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? 'Claim' : 'Insufficient Points'; ?>
+              </button>
+            </div>
+          <?php
+                endif;
+              endforeach;
+              if (!$hasAvailable):
+          ?>
+            <p>No rewards available at the moment.</p>
+          <?php
+              endif;
+            else:
+          ?>
             <p>No rewards available at the moment.</p>
           <?php endif; ?>
         </div>

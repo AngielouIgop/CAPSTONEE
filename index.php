@@ -1,5 +1,5 @@
 <?php
-// session_start();
+session_start();
 echo "<title>B.A.S.U.R.A. Rewards</title>";
 
 echo "<div>";

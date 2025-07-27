@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login</title>
   <link rel="stylesheet" href="css/login.css" />
-  <link rel="stylesheet" href="css/header-footer.css">
 </head>
+
 <body>
   <div class="login-container">
     <div class="logo-side">
       <img src="images/basura logo.png" alt="Logo" class="logo" />
-      <h1>Barangay Rewards</h1>
+      <h1>B.A.S.U.R.A. Rewards</h1>
       <p id="loginType">Official Admin Login</p>
     </div>
     <div class="form-side">
@@ -27,22 +28,43 @@
         <label for="username">Username</label>
         <input type="text" id="username" name="username" required>
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
+        <div class="password-container">
+          <input type="password" id="password" name="password" required>
+          <button type="button" class="password-toggle" onclick="togglePassword()" id="passwordToggle">Show</button>
+        </div>
         <button type="submit" class="btn-primary">Login</button>
+        <p class="register-link">
+          Don't have an account yet?<br>
+        </p>
         <a href="?command=register" class="btn-secondary">Register</a>
       </form>
     </div>
   </div>
-  
-  <?php include_once("view/footer.php"); ?>
-  
-<script>
-  function toggleLoginType() {
-    const role = document.getElementById('loginRole').value;
-    const loginType = document.getElementById('loginType');
-    loginType.textContent = role === 'user' ? "Official User Login" : "Official Admin Login";
-  }
-  document.addEventListener('DOMContentLoaded', toggleLoginType);
-</script>
+
+  <script>
+    function toggleLoginType() {
+      const role = document.getElementById('loginRole').value;
+      const loginType = document.getElementById('loginType');
+      loginType.textContent = role === 'user' ? "Official User Login" : "Official Admin Login";
+    }
+
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const passwordToggle = document.getElementById('passwordToggle');
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordToggle.textContent = 'Hide';
+        passwordToggle.title = 'Hide password';
+      } else {
+        passwordInput.type = 'password';
+        passwordToggle.textContent = 'Show';
+        passwordToggle.title = 'Show password';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', toggleLoginType);
+  </script>
 </body>
+
 </html>

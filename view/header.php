@@ -1,10 +1,6 @@
 <link rel="stylesheet" href="css/header-footer.css">
 <link rel="stylesheet" href="css/uni-sidebar.css">
-<?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-?>
+
 <header class="header-main">
   <div class="header-logo">
     <a href="?command=home">
@@ -25,11 +21,15 @@ if (session_status() === PHP_SESSION_NONE) {
   <?php elseif (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'user'): ?>
   <nav class="header-nav">
     <ul>
-      <li><a href="?command=contribute" class="start-contributing-btn">Start Contributing</a></li>
+      <li>
+       <a href="#" class="start-contributing-btn" onclick="openContributeModal(); return false;">Start Contributing</a>
+
+      </li>
     </ul>
   </nav>
   <?php endif; ?>
 </header>
+
 <?php
 if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
     // Admin sidebar
@@ -46,9 +46,6 @@ if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
                 <a href="?command=logout">Logout</a>
             </div>
         </div>
-        <!-- <div class="logout-link">
-            <a href="?command=logout">Logout</a>
-        </div> -->
     </div>
     <?php
 } elseif (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'user') {
@@ -65,9 +62,6 @@ if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
                 <a href="?command=logout">Logout</a>
             </div>
         </div>
-        <!-- <div class="logout-link">
-            <a href="?command=logout">Logout</a>
-        </div> -->
     </div>
     <?php
 }

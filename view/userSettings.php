@@ -1,3 +1,11 @@
+<?php include 'header.php'; ?>
+<?php include 'contribute.php'; ?>
+
+<script>
+  var userID = '<?php echo $_SESSION['user']['userID']; ?>';
+</script>
+<script src="js/contributeModal.js"></script>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

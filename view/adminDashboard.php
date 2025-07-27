@@ -1,10 +1,3 @@
-<?php
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header('location: ?command=login');
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +17,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                 <div class="admin-card">
                     <h5>User Management</h5>
                     <p>Add, edit, or remove users from the system.</p>
-                    <a href="?command=manageUsers" class="btn-primary">Manage Users</a>
+                    <a href="?command=manageUser" class="btn-primary">Manage Users</a>
                 </div>
                 <div class="admin-card">
                     <h5>Rewards Inventory</h5>

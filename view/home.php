@@ -1,4 +1,3 @@
-<?php include_once('view/header.php'); ?>
 <link rel="stylesheet" href="css/home.css">
 
 <div class="header-image-container">

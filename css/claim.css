@@ -3,36 +3,47 @@ body {
   font-family: 'Segoe UI', Arial, sans-serif;
   margin: 0;
   padding: 0;
+  padding-top: 100px;
+  padding-left: 220px;
 }
 
 .rewards-header {
-  background: #fbeeee;
-  border-radius: 12px 12px 0 0;
-  padding: 20px 30px 10px 30px;
-  font-size: 1.3rem;
-  font-weight: 600;
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
-  max-width: 900px;
-  margin: 30px auto 0 auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  justify-content: center;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+}
+
+.rewards-header span:first-child {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.rewards-header span:last-child {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #666;
 }
 
 .rewards-list {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
-  justify-content: flex-start;
+  justify-content: center;
   background: #fbeeee;
   border-radius: 0 0 12px 12px;
-  max-width: 900px;
+  max-width: 1500px;
   margin: 0 auto 40px auto;
+  padding-top: 100px;
   padding: 40px 30px 30px 30px;
   min-height: 400px;
 }
 
 .reward-card {
+  justify-content: center;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);

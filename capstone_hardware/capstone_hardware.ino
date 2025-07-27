@@ -1,244 +1,233 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <ArduinoJson.h>
 
-const char* ssid = "Montinola";
-const char* password = "MONTinol@0815";
-const char* serverName = "http://192.168.1.8/CAPSTONEE/endpoint.php";
+// WiFi credentials
+const char* ssid = "PLDTHOMEFIBR726d0";
+const char* password = "PLDTWIFI2f7xd";
+const char* serverName = "http://192.168.1.13/CAPSTONEE/endpoint.php";
 
-//userID fetching
+// User info
 int userID = 0;
 bool userIDSet = false;
 String username = "";
 
-const int SENSOR_PIN = 34;
+// Sensor pins
+const int SENSOR_PIN_1 = 34; // plastic bottle
+const int SENSOR_PIN_2 = 35; // glass bottle
+const int SENSOR_PIN_3 = 32; // tin cans
+
+// Buzzer pin
+const int BUZZER_PIN = 33; // adjust according to your wiring
+
+// Reading validation
 const int NUM_READINGS = 10;
 const int READING_DELAY = 50;
 
-const int PLASTIC_THRESHOLD_MIN = 100;
-const int PLASTIC_THRESHOLD_MAX = 600;
+// Thresholds
+const int PLASTIC_THRESHOLD_MIN = 44;
+const int PLASTIC_THRESHOLD_MAX = 100;
+const int BOTTLE_THRESHOLD_MIN = 28;
+const int BOTTLE_THRESHOLD_MAX = 41;
+const int CAN_THRESHOLD_MIN = 8;
+const int CAN_THRESHOLD_MAX = 27;
 const int CONFIDENCE_THRESHOLD = 7;
 
+// Timing for main loop
 unsigned long previousMillis = 0;
-unsigned long sensorPreviousMillis = 0;
-const long sensorInterval = 2000;
-const long readingInterval = 50;
+const long interval = 5000; // 5 seconds
 
-//Function to fetch userID from the server
-// Function to fetch userID from the server
-bool fetchUserFromServer() {
-    if (WiFi.status() != WL_CONNECTED) { // 'WiFi', not 'Wifi'
-        Serial.println("WiFi not connected. Cannot fetch userID.");
-        return false;
-    }
-
+bool fetchCurrentUser() {
     HTTPClient http;
-    http.begin("http://192.168.1.8/CAPSTONEE/endpoint.php");
-
-    Serial.println("Fetching current userID from the server...");
-
+    http.begin("http://192.168.1.13/CAPSTONEE/get_current_user.php");
     int httpResponseCode = http.GET();
-    Serial.print("HTTP Response code: ");
-    Serial.println(httpResponseCode); // Use println for new line
-
     if (httpResponseCode > 0) {
-        String response = http.getString(); // '=' missing
+        String response = http.getString();
         Serial.println("Response: " + response);
-
         DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response);
-
-        if (!error) {
-            if (doc.containsKey("userID")) {
-                userID = doc["userID"]; // Use double quotes for JSON keys
-                username = doc["username"] | "Unknown"; // Typo: "Unknown"
-                userIDSet = true;
-
-                Serial.print("userID fetched successfully: ");
-                Serial.println(userID);
-                Serial.print("Username: ");
-                Serial.println(username);
-                http.end();
-                return true;
-            } else if (doc.containsKey("error")) {
-                Serial.print("Server error: ");
-                Serial.println(doc["error"].as<String>());
-            }
+        if (!error && doc.containsKey("userID")) {
+            userID = doc["userID"];
+            username = doc["username"] | "Unknown";
+            userIDSet = true;
+            Serial.print("Current user: "); Serial.println(username);
+            Serial.print("UserID: "); Serial.println(userID);
+            return true;
         } else {
-            Serial.print("JSON parsing failed: ");
-            Serial.println(error.c_str());
+            Serial.println("No user currently logged in or JSON parsing error.");
+            Serial.println("Error: " + String(error.c_str()));
         }
     } else {
-        Serial.print("Error on HTTP GET: ");
-        Serial.println(httpResponseCode);
-        Serial.print("Error details: ");
-        Serial.println(http.errorToString(httpResponseCode));
+        Serial.print("Error on fetching current user: "); Serial.println(httpResponseCode);
+        Serial.print("Error details: "); Serial.println(http.errorToString(httpResponseCode));
     }
     http.end();
     return false;
 }
 
-int getAverageReading() {
+int getAverageReading(int sensorPin) {
     int total = 0;
     int validReadings = 0;
 
-    for(int i = 0; i < NUM_READINGS; i++) {
-        int reading = analogRead(SENSOR_PIN);
-        if(reading > 0) {
+    for (int i = 0; i < NUM_READINGS; i++) {
+        int reading = analogRead(sensorPin);
+        if (reading > 0) {
             total += reading;
             validReadings++;
         }
-
-        unsigned long currentMillis = millis();
-        while(millis() - currentMillis < readingInterval) {
-            // Wait for reading interval
-        }
+        delay(READING_DELAY);
     }
 
-    if(validReadings == 0) return 0;
+    if (validReadings == 0) return 0;
     return total / validReadings;
 }
 
-String determineMaterial(int sensorValue) {
-    Serial.print("Raw sensor value: ");
-    Serial.println(sensorValue);
-
+String determineMaterial() {
     int plasticCount = 0;
-    int readings[NUM_READINGS];
+    int bottleCount = 0;
+    int canCount = 0;
 
-    for(int i = 0; i < NUM_READINGS; i++) {
-        readings[i] = analogRead(SENSOR_PIN);
-        Serial.print("Reading ");
-        Serial.print(i);
-        Serial.print(": ");
-        Serial.println(readings[i]);
-        
-        if(readings[i] > PLASTIC_THRESHOLD_MIN && readings[i] < PLASTIC_THRESHOLD_MAX) {
+    Serial.println("--- Material Determination ---");
+    for (int i = 0; i < NUM_READINGS; i++) {
+        int plasticReading = analogRead(SENSOR_PIN_1);
+        int bottleReading = analogRead(SENSOR_PIN_2);
+        int canReading = analogRead(SENSOR_PIN_3);
+
+        Serial.print("Plastic Reading "); Serial.print(i); Serial.print(": "); Serial.println(plasticReading);
+        Serial.print("Glass Reading "); Serial.print(i); Serial.print(": "); Serial.println(bottleReading);
+        Serial.print("Can Reading "); Serial.print(i); Serial.print(": "); Serial.println(canReading);
+
+        if (plasticReading >= PLASTIC_THRESHOLD_MIN && plasticReading <= PLASTIC_THRESHOLD_MAX)
             plasticCount++;
-        }
-        unsigned long currentMillis = millis();
-        while(millis() - currentMillis < readingInterval) {
-            // Wait for reading interval
-        }
+        if (bottleReading >= BOTTLE_THRESHOLD_MIN && bottleReading <= BOTTLE_THRESHOLD_MAX)
+            bottleCount++;
+        if (canReading >= CAN_THRESHOLD_MIN && canReading <= CAN_THRESHOLD_MAX)
+            canCount++;
+
+        delay(READING_DELAY);
     }
 
-    Serial.print("Plastic count: ");
-    Serial.println(plasticCount);
+    Serial.print("Plastic count: "); Serial.println(plasticCount);
+    Serial.print("Bottle count: "); Serial.println(bottleCount);
+    Serial.print("Can count: "); Serial.println(canCount);
 
-    if(plasticCount >= CONFIDENCE_THRESHOLD) {
-        return "Plastic Bottles";  // Must match exactly with database
-    }
-
+    if (plasticCount >= CONFIDENCE_THRESHOLD) return "Plastic Bottles";
+    else if (bottleCount >= CONFIDENCE_THRESHOLD) return "Glass Bottles";
+    else if (canCount >= CONFIDENCE_THRESHOLD) return "Cans";
     return "unknown";
 }
 
 void setup() {
     Serial.begin(9600);
-    while(!Serial) {
-        ; // Wait for serial port to connect
-    }
+    delay(2000);
+    Serial.println("=== SETUP STARTING ===");
 
-    Serial.println("ESP32 is starting...");
-    Serial.println("Initializing WiFi...");
+    pinMode(BUZZER_PIN, OUTPUT);
+    digitalWrite(BUZZER_PIN, LOW);
 
     WiFi.begin(ssid, password);
     Serial.print("Connecting to WiFi");
-
     int attempts = 0;
-    while(WiFi.status() != WL_CONNECTED && attempts < 20) {
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
         delay(500);
         Serial.print(".");
         attempts++;
     }
     Serial.println();
 
-    if(WiFi.status() == WL_CONNECTED) {
-        Serial.print("Connected to SSID: ");
-        Serial.println(WiFi.SSID());
-        Serial.print("ESP32 IP Address: ");
-        Serial.println(WiFi.localIP());
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.print("Connected to SSID: "); Serial.println(WiFi.SSID());
+        Serial.print("ESP32 IP Address: "); Serial.println(WiFi.localIP());
+        fetchCurrentUser();
     } else {
         Serial.println("Failed to connect to WiFi");
     }
 
-    Serial.println("Calibrating sensor...");
+    Serial.println("Calibrating sensors (waiting for 1 second)...");
     unsigned long startTime = millis();
-    while(millis() - startTime < 1000) {
-        // Wait for sensor to stabilize
+    while (millis() - startTime < 1000) {
+        analogRead(SENSOR_PIN_1);
+        analogRead(SENSOR_PIN_2);
+        analogRead(SENSOR_PIN_3);
+        delay(10);
     }
 
-    int initialReading = getAverageReading();
-    Serial.print("Initial sensor reading: ");
-    Serial.println(initialReading);
+    int initialPlastic = getAverageReading(SENSOR_PIN_1);
+    int initialGlass = getAverageReading(SENSOR_PIN_2);
+    int initialCan = getAverageReading(SENSOR_PIN_3);
+    Serial.print("Initial Plastic sensor reading: "); Serial.println(initialPlastic);
+    Serial.print("Initial Glass sensor reading: "); Serial.println(initialGlass);
+    Serial.print("Initial Can sensor reading: "); Serial.println(initialCan);
+    Serial.println("=== SETUP COMPLETE ===");
 }
 
 void loop() {
     unsigned long currentMillis = millis();
 
-    if(WiFi.status() != WL_CONNECTED) {
+    if (WiFi.status() != WL_CONNECTED) {
         Serial.println("WiFi Disconnected. Attempting to reconnect...");
         WiFi.begin(ssid, password);
         delay(5000);
+        if (WiFi.status() == WL_CONNECTED) {
+            Serial.println("WiFi Reconnected!");
+            fetchCurrentUser();
+        }
         return;
     }
 
-    // Check if it's time to read the sensor
-    if(currentMillis - sensorPreviousMillis >= sensorInterval) {
-        sensorPreviousMillis = currentMillis;
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
 
-        // Get average sensor reading
-        int sensorValue = getAverageReading();
-        Serial.print("Average Sensor Value: ");
-        Serial.println(sensorValue);
+        Serial.println("\n--- Initiating Sensor Scan ---");
+        int plasticValue = getAverageReading(SENSOR_PIN_1);
+        int glassValue = getAverageReading(SENSOR_PIN_2);
+        int canValue = getAverageReading(SENSOR_PIN_3);
+        Serial.print("Average Plastic Sensor Value: "); Serial.println(plasticValue);
+        Serial.print("Average Glass Sensor Value: "); Serial.println(glassValue);
+        Serial.print("Average Can Sensor Value: "); Serial.println(canValue);
 
-        // Determine material type with confidence
-        String materialType = determineMaterial(sensorValue);
-        Serial.print("Detected Material: ");
-        Serial.println(materialType);
+        String materialType = determineMaterial();
+        Serial.print("Detected Material: "); Serial.println(materialType);
 
-        if(materialType != "unknown") {
+        if (materialType != "unknown") {
+            digitalWrite(BUZZER_PIN, HIGH);
+            delay(500);
+            digitalWrite(BUZZER_PIN, LOW);
+        }
+
+        int sensorValue = 0;
+        if (materialType == "Plastic Bottles") sensorValue = plasticValue;
+        else if (materialType == "Glass Bottles") sensorValue = glassValue;
+        else if (materialType == "Cans") sensorValue = canValue;
+
+        if (materialType != "unknown" && userIDSet) {
             HTTPClient http;
-            
-            // Debug server URL
-            Serial.print("Connecting to server: ");
-            Serial.println(serverName);
-            
+            Serial.print("Connecting to server: "); Serial.println(serverName);
             http.begin(serverName);
             http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-            
-            // Send sensor_value, material, and userID
-            String httpRequestData = "sensor_value=" + String(sensorValue) + 
-                                   "&material=" + materialType + 
-                                   "&userID=" + String(userID);
-            
-            Serial.print("Sending data: ");
-            Serial.println(httpRequestData);
-            
-            // Debug HTTP request
-            Serial.println("Sending POST request...");
+            String httpRequestData = "sensor_value=" + String(sensorValue) +
+                                     "&material=" + materialType +
+                                     "&userID=" + String(userID);
+            Serial.print("Sending data: "); Serial.println(httpRequestData);
             int httpResponseCode = http.POST(httpRequestData);
-            Serial.print("HTTP Response code: ");
-            Serial.println(httpResponseCode);
-            
-            if(httpResponseCode > 0) {
+            Serial.print("HTTP Response code: "); Serial.println(httpResponseCode);
+            if (httpResponseCode > 0) {
                 String response = http.getString();
                 Serial.println("Response: " + response);
-                
-                // Debug response details
-                if(response.indexOf("Success") >= 0) {
+                if (response.indexOf("Success") >= 0)
                     Serial.println("Data successfully saved to database");
-                } else if(response.indexOf("Error") >= 0) {
+                else if (response.indexOf("Error") >= 0)
                     Serial.println("Error saving to database: " + response);
-                }
             } else {
-                Serial.print("Error on sending POST: ");
-                Serial.println(httpResponseCode);
-                Serial.print("Error details: ");
-                Serial.println(http.errorToString(httpResponseCode));
+                Serial.print("Error on sending POST: "); Serial.println(httpResponseCode);
+                Serial.print("Error details: "); Serial.println(http.errorToString(httpResponseCode));
             }
-            
             http.end();
+        } else if (materialType == "unknown") {
+            Serial.println("Material not identified with confidence.");
         } else {
-            Serial.println("Material not identified with confidence");
+            Serial.println("User ID not set. Cannot send data.");
+            fetchCurrentUser();
         }
     }
-} 
+}

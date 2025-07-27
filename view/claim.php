@@ -1,4 +1,13 @@
-<?php ?>
+<?php include 'header.php'; ?>
+<?php include 'contribute.php'; ?>
+
+<script>
+  var userID = '<?php echo $_SESSION['user']['userID']; ?>';
+</script>
+<script src="js/contributeModal.js"></script>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,10 +17,12 @@
   <title>Claim</title>
 </head>
 <body>
-<div class="rewards-header">
-  <span>Available Rewards:</span>
+
+ <div class="rewards-header">
+  <!-- <span>Available Rewards:</span> -->
   <span style="float:right;">CURRENT POINTS: <b><?php echo htmlspecialchars($totalCurrentPoints); ?> pts</b></span>
 </div>
+
 <div class="rewards-list">
   <?php
     $maxCards = 8;
@@ -19,9 +30,20 @@
     if (!empty($rewards)) {
       foreach ($rewards as $reward) {
         $rewardCount++;
+        // Image logic: use file path if exists, else base64 if binary, else default
+        if (!empty($reward['rewardImg'])) {
+          if (file_exists($reward['rewardImg'])) {
+            $src = $reward['rewardImg'];
+          } else {
+            $imgData = base64_encode($reward['rewardImg']);
+            $src = 'data:image/jpeg;base64,' . $imgData;
+          }
+        } else {
+          $src = 'images/default-reward.png';
+        }
   ?>
     <div class="reward-card">
-      <img src="<?php echo !empty($reward['rewardImg']) ? 'data:image/jpeg;base64,' . base64_encode($reward['rewardImg']) : 'images/default-reward.png'; ?>" alt="<?php echo htmlspecialchars($reward['rewardName']); ?>">
+      <img src="<?php echo htmlspecialchars($src); ?>" alt="<?php echo htmlspecialchars($reward['rewardName']); ?>">
       <div class="reward-name"><?php echo htmlspecialchars($reward['rewardName']); ?></div>
       <div class="reward-points"><?php echo htmlspecialchars($reward['pointsRequired']); ?> pts</div>
       <button class="claim-btn <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? 'available' : 'insufficient'; ?>"

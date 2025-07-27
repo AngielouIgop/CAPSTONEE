@@ -2,7 +2,7 @@ html, body {
   min-height: 120vh;
   margin: 0;
   padding: 0;
-  background: #fbeeee;
+  background: #f7f7f7;
   font-family: 'Segoe UI', Arial, sans-serif;
   margin-left: 150px;
   padding-top: 50px;
@@ -40,6 +40,13 @@ html, body {
   gap: 2rem;
 }
 
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+}
+
 .profile-avatar {
   width: 90px;
   height: 90px;
@@ -68,6 +75,8 @@ html, body {
   flex-direction: column;
   gap: 0.2rem;
   justify-content: center;
+  text-align: center;
+  margin-top: 8px;
 }
 
 .profile-name {
@@ -78,11 +87,9 @@ html, body {
   margin-bottom: 0.2rem;
 }
 
-.profile-address,
 .profile-zone {
-  font-size: 1.1rem;
-  color: #444;
-  font-weight: 500;
+  color: #888;
+  font-size: 1em;
 }
 
 .rewards-section {
@@ -146,7 +153,7 @@ html, body {
   background: #eaeaf0;
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  width: 170px;
+  width: 200px;
   padding: 1.2rem 1rem 1rem 1rem;
   display: flex;
   flex-direction: column;
@@ -156,9 +163,9 @@ html, body {
 }
 
 .reward-card img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
   margin-bottom: 0.7rem;
 }
 
@@ -187,6 +194,11 @@ html, body {
   cursor: pointer;
   margin-top: 0.2rem;
   transition: background 0.2s;
+  width: 100%;
+  padding: 8px 0;
+  border-radius: 6px;
+  background: #4caf50;
+  color: #fff;
 }
 
 .claim-btn.available {
@@ -212,5 +224,27 @@ html, body {
   .rewards-list {
       flex-direction: column;
       align-items: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .user-dashboard {
+    max-width: 100%;
+    padding: 8px;
+  }
+  .rewards-list {
+    gap: 8px;
+  }
+  .reward-card {
+    width: 45vw;
+    min-width: 120px;
+    padding: 8px;
+  }
+  .profile-header {
+    padding: 8px 0;
+  }
+  .profile-avatar img {
+    width: 72px;
+    height: 72px;
   }
 }
