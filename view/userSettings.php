@@ -51,10 +51,6 @@
             <input type="file" name="profilePicture" accept="image/*" style="display:none;" onchange="imagePreview(event)">
           </label>
           <?php if (!empty($users['profilePicture'])): ?>
-          <label class="delete-picture-btn">
-            <input type="checkbox" name="removeProfilePicture" value="1" style="display:none;" id="removeProfilePicture">
-            <span onclick="document.getElementById('removeProfilePicture').checked = true;">Remove picture</span>
-          </label>
           <?php endif; ?>
         </div>
       </div>

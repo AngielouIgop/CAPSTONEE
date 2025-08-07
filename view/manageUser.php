@@ -9,6 +9,7 @@
 </head>
 
 <body>
+     <button class="pill-btn add-admin-btn" style="float:right;">Add an Admin</button>    
     <div class="section-header">
         Manage Users
         <!-- <button class="pill-btn" style="float:right;">Pending Registrations</button> -->
@@ -51,7 +52,6 @@
 
     <div class="section-header">
         Admins
-        <button class="pill-btn add-admin-btn" style="float:right;">Add an Admin</button>
     </div>
     <div class="table-container">
         <table class="custom-table">
@@ -112,8 +112,8 @@
             <label for="edit-confirmPassword">Confirm Password</label>
             <input type="password" id="edit-confirmPassword" name="confirmPassword">
 
-            <label for="edit-profilePicture">Profile Picture</label>
-            <input type="file" id="edit-profilePicture" name="profilePicture" accept="image/*">
+            <!-- <label for="edit-profilePicture">Profile Picture</label>
+            <input type="file" id="edit-profilePicture" name="profilePicture" accept="image/*"> -->
 
             <div class="modal-buttons">
                 <button type="submit" class="btn-confirm">Confirm</button>

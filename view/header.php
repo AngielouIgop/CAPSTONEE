@@ -23,12 +23,20 @@
     <ul>
       <li>
        <a href="#" class="start-contributing-btn" onclick="openContributeModal(); return false;">Start Contributing</a>
-
+      </li>
+    </ul>
+  </nav>
+  <?php elseif (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin'): ?>
+  <nav class="header-nav">
+    <ul>
+      <li>
+       <a href="#" class="notifications-btn" onclick="openNotificationModal(); return false;">Notifications</a>
       </li>
     </ul>
   </nav>
   <?php endif; ?>
 </header>
+
 
 <?php
 if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
@@ -36,8 +44,9 @@ if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
     ?>
     <div class="sidebar">
         <div>
-            <h4 class="sidebar-title">Sidebar</h4>
-            <div class="nav-links">
+          <h4 class="sidebar-title">Sidebar</h4>
+          <div class="nav-links">
+              <!-- <button class="sidebar-toggle">☰</button> -->
                 <a href="?command=adminDashboard">Home</a>
                 <a href="?command=manageUser">Manage Users</a>
                 <a href="?command=rewardInventory">Reward Inventory</a>
@@ -53,8 +62,9 @@ if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
     ?>
     <div class="sidebar">
         <div>
-            <h4 class="sidebar-title">Sidebar</h4>
-            <div class="nav-links">
+          <h4 class="sidebar-title">Sidebar</h4>
+          <div class="nav-links">
+              <!-- <button class="toggle-sidebar">☰</button> -->
                 <a href="?command=dashboard">Home</a>
                 <a href="?command=userProfile">Profile</a>
                 <a href="?command=userSettings">Settings</a>
@@ -63,6 +73,19 @@ if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
             </div>
         </div>
     </div>
+
     <?php
 }
 ?>
+
+
+<!-- <script>
+const toggleButton = document.querySelector('.toggle-sidebar');
+const sidebar = document.querySelector('.sidebar');
+const mainContent = document.querySelector('.main-content');
+
+toggleButton.addEventListener('click', () => {
+  sidebar.classList.toggle('sidebar-hidden');
+  mainContent.classList.toggle('sidebar-hidden');
+});
+</script> -->

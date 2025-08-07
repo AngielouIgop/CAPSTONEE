@@ -36,7 +36,7 @@
                                     $src = 'data:image/jpeg;base64,' . $imgData;
                                 }
                             } else {
-                                $src = 'images/default-reward.png';
+                                $src = 'images/coming-soon.png';
                             }
                             ?>
                             <img src="<?= htmlspecialchars($src); ?>" alt="<?= htmlspecialchars($reward['rewardName']); ?>" style="width:40px;height:40px;border-radius:8px;">

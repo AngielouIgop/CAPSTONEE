@@ -147,8 +147,8 @@ body {
     flex: 2;
   }
   
-  .save-btn {
-    width: 100%;
+   .save-btn {
+    width: 20%;
     background: #2336b6;
     color: #fff;
     border: none;
@@ -157,6 +157,7 @@ body {
     font-size: 1.1em;
     font-weight: bold;
     margin-top: 9rem;
+    margin-left: 25rem;
     cursor: pointer;
     transition: background 0.2s;
   }

@@ -97,6 +97,16 @@ class Controller
                 break;
 
             case 'dashboard':
+                if (!isset($_SESSION['user'])) {
+                    header('Location: ?command=Login');
+                    exit();
+                }
+
+                $userID = $_SESSION['user']['userID'];
+                $userTotalPlastic = $this->model->getUserTotalPlastic($userID);
+                $userTotalGlass = $this->model->getUserTotalGlassBottles($userID);
+                $userTotalCans = $this->model->getUserTotalCans($userID);
+
                 include_once('view/dashboard.php');
                 break;
 
@@ -262,6 +272,9 @@ class Controller
                 break;
 
             case 'adminDashboard':
+                $totalPlastic = $this->model->getTotalPlasticCont();
+                $totalCans = $this->model->getTotalCansCont();
+                $totalGlassBottles = $this->model->getTotalGlassBottlesCont();
                 include_once('view/admindashboard.php');
                 break;
 
@@ -365,8 +378,6 @@ class Controller
                     header('Location: ?command=Login');
                 }
                 $userID = $_SESSION['user']['userID'];
-                // $users = $this->model->getUserPoints($userID);
-                // $totalCurrentPoints = $this->model->getUserPoints($userID);
                 $rewards = $this->model->getAllRewards();
                 include_once('view/rewardinventory.php');
                 break;
@@ -380,50 +391,50 @@ class Controller
                 $availability = isset($_POST['availability']) ? intval($_POST['availability']) : 1;
                 $imagePath = null;
 
-                // Validate inputs
-                if (empty($rewardName) || empty($pointsRequired) || empty($slotNum) || empty($availableStock)) {
-                    echo "<script>alert('Please fill out all fields.'); window.location.href='?command=rewardInventory';</script>";
-                    exit();
-                }
-
-                // Handle image upload (save file path, not binary)
+                // Check if a new image was uploaded
                 if (!empty($_FILES['rewardImg']['name'])) {
-                    $targetDir = "rewards/";
+                    // Delete old image
+                    $current = $this->model->getRewardByID($rewardID);
+                    if ($current && !empty($current['rewardImg']) && file_exists($current['rewardImg'])) {
+                        unlink($current['rewardImg']);
+                    }
+
+                    // Upload new image
+                    $targetDir = "reward/";
                     if (!is_dir($targetDir)) {
                         mkdir($targetDir, 0777, true);
                     }
+
                     $fileName = uniqid() . '_' . basename($_FILES['rewardImg']['name']);
                     $imagePath = $targetDir . $fileName;
                     $imageFileType = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
                     $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
-                    $check = getimagesize($_FILES['rewardImg']['tmp_name']);
 
+                    $check = getimagesize($_FILES['rewardImg']['tmp_name']);
                     if ($check === false) {
                         echo "<script>alert('File is not an image.'); window.location.href='?command=rewardInventory';</script>";
                         exit();
                     }
+
                     if (!in_array($imageFileType, $allowedTypes)) {
                         echo "<script>alert('Only JPG, JPEG, PNG & GIF files are allowed.'); window.location.href='?command=rewardInventory';</script>";
                         exit();
                     }
+
                     if (!move_uploaded_file($_FILES['rewardImg']['tmp_name'], $imagePath)) {
                         echo "<script>alert('Failed to upload image.'); window.location.href='?command=rewardInventory';</script>";
                         exit();
                     }
                 }
 
-                // Update reward in the database
+                // Update reward
                 $result = $this->model->updateReward($rewardName, $pointsRequired, $slotNum, $availableStock, $rewardID, $imagePath, $availability);
 
-                if ($result) {
-                    echo "<script>alert('Reward updated successfully.'); window.location.href='?command=rewardInventory';</script>";
-                } else {
-                    echo "<script>alert('Failed to update reward.'); window.location.href='?command=rewardInventory';</script>";
-                }
+                echo "<script>alert('" . ($result ? "Reward updated successfully." : "Failed to update reward.") . "'); window.location.href='?command=rewardInventory';</script>";
                 break;
 
+
             case 'addReward':
-                $rewardID = $_POST['rewardID'];
                 $rewardName = $_POST['rewardName'];
                 $availableStock = $_POST['availableStock'];
                 $slotNum = $_POST['slotNum'];
@@ -437,43 +448,43 @@ class Controller
                     exit();
                 }
 
-                // Handle image upload (save file path, not binary)
+                // Upload image and store file path
                 if (!empty($_FILES['rewardImg']['name'])) {
-                    $targetDir = "rewards/";
+                    $targetDir = "reward/";
                     if (!is_dir($targetDir)) {
                         mkdir($targetDir, 0777, true);
                     }
+
                     $fileName = uniqid() . '_' . basename($_FILES['rewardImg']['name']);
                     $imagePath = $targetDir . $fileName;
                     $imageFileType = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
                     $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
-                    $check = getimagesize($_FILES['rewardImg']['tmp_name']);
 
+                    $check = getimagesize($_FILES['rewardImg']['tmp_name']);
                     if ($check === false) {
                         echo "<script>alert('File is not an image.'); window.location.href='?command=rewardInventory';</script>";
                         exit();
                     }
+
                     if (!in_array($imageFileType, $allowedTypes)) {
                         echo "<script>alert('Only JPG, JPEG, PNG & GIF files are allowed.'); window.location.href='?command=rewardInventory';</script>";
                         exit();
                     }
+
                     if (!move_uploaded_file($_FILES['rewardImg']['tmp_name'], $imagePath)) {
                         echo "<script>alert('Failed to upload image.'); window.location.href='?command=rewardInventory';</script>";
                         exit();
                     }
                 }
 
-                // Save reward with image path (or null if no image)
+                // Save to DB
                 $result = $this->model->addReward($rewardName, $pointsRequired, $slotNum, $availableStock, $imagePath, $availability);
 
-                if ($result) {
-                    echo "<script>alert('Reward added successfully.'); window.location.href='?command=rewardInventory';</script>";
-                } else {
-                    echo "<script>alert('Failed to add reward.'); window.location.href='?command=rewardInventory';</script>";
-                }
+                echo "<script>alert('" . ($result ? "Reward added successfully." : "Failed to add reward.") . "'); window.location.href='?command=rewardInventory';</script>";
                 break;
 
-                case 'deleteReward':
+
+            case 'deleteReward':
                 $rewardID = $_REQUEST['rewardID'];
                 $result = $this->model->deleteReward($rewardID);
                 echo "<script>
@@ -484,6 +495,19 @@ class Controller
 
 
             case 'adminReport':
+                if (isset($_POST['date'])) {
+                    // $dateFilter = $_POST['date'];
+                    $data = $this->model->getContributionData($_POST['date']); // Retrieve the updated data
+                    echo json_encode($data); // Return the data as a JSON response
+                    exit;
+                }
+                $wasteHistory = $this->model->getTotalWasteHistory();
+                $totalWasteContributions = $this->model->getTotalWasteContributions();
+                $totalPlastic = $this->model->getTotalPlasticCont();
+                $totalCans = $this->model->getTotalCansCont();
+                $totalGlassBottles = $this->model->getTotalGlassBottlesCont();
+                $users = $this->model->getAllUsers();
+                $contPerZone = $this->model->getTotalWasteContributionsPerZone();
                 include_once('view/adminReport.php');
                 break;
 

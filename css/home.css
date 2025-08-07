@@ -2,9 +2,10 @@ body, html {
     margin: 0;
     padding: 0;
     height: 300vh;
+    width: 100%;
     box-sizing: border-box;
-    scroll-behavior: smooth;
-    
+    scroll-behavior: smooth;    
+    overflow-x: hidden;
 }
 
 a {
@@ -12,9 +13,9 @@ a {
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 100%;
+    height: auto;
     margin: 0 auto;
-    padding: 0 20px;
 }
 
 .header-image-container {
@@ -187,9 +188,12 @@ a {
 
 /* Add styles for the Contact Us section */
 .contact-us-section {
-    text-align: center;
-    padding: 50px 20px;
-    background-color: #aeb8d9; /* Example lighter blue/purple color, adjust as needed */
+  text-align: center;
+  padding: 50px 0; /* Remove the horizontal padding */
+  background-color: #aeb8d9; /* Example lighter blue/purple color, adjust as needed */
+  width: auto; /* Add this property to make it full-width */
+  margin: 0 auto; /* Add this property to center it horizontally */
+  box-sizing: border-box; /* Add this property to include padding in the width calculation */
 }
 
 .contact-divider {

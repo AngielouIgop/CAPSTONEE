@@ -6,8 +6,6 @@
 </script>
 <script src="js/contributeModal.js"></script>
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,50 +16,49 @@
 </head>
 <body>
 
- <div class="rewards-header">
-  <!-- <span>Available Rewards:</span> -->
-  <span style="float:right;">CURRENT POINTS: <b><?php echo htmlspecialchars($totalCurrentPoints); ?> pts</b></span>
-</div>
+  <div class="rewards-header">
+    <span>Available Rewards:</span>
+    <span>CURRENT POINTS: <b><?php echo htmlspecialchars($totalCurrentPoints); ?> pts</b></span>
+  </div>
 
-<div class="rewards-list">
-  <?php
-    $maxCards = 8;
-    $rewardCount = 0;
-    if (!empty($rewards)) {
-      foreach ($rewards as $reward) {
-        $rewardCount++;
-        // Image logic: use file path if exists, else base64 if binary, else default
-        if (!empty($reward['rewardImg'])) {
-          if (file_exists($reward['rewardImg'])) {
-            $src = $reward['rewardImg'];
+  <div class="rewards-list">
+    <?php
+      $maxCards = 8;
+      $rewardCount = 0;
+      if (!empty($rewards)) {
+        foreach ($rewards as $reward) {
+          $rewardCount++;
+          if (!empty($reward['rewardImg'])) {
+            if (file_exists($reward['rewardImg'])) {
+              $src = $reward['rewardImg'];
+            } else {
+              $imgData = base64_encode($reward['rewardImg']);
+              $src = 'data:image/jpeg;base64,' . $imgData;
+            }
           } else {
-            $imgData = base64_encode($reward['rewardImg']);
-            $src = 'data:image/jpeg;base64,' . $imgData;
+            $src = 'images/default-reward.png';
           }
-        } else {
-          $src = 'images/default-reward.png';
+    ?>
+      <div class="reward-card">
+        <img src="<?php echo htmlspecialchars($src); ?>" alt="<?php echo htmlspecialchars($reward['rewardName']); ?>">
+        <div class="reward-name"><?php echo htmlspecialchars($reward['rewardName']); ?></div>
+        <div class="reward-points"><?php echo htmlspecialchars($reward['pointsRequired']); ?> pts</div>
+        <button class="claim-btn <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? 'available' : 'insufficient'; ?>"
+          <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? '' : 'disabled'; ?>>
+          <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? 'Claim' : 'Insufficient points'; ?>
+        </button>
+      </div>
+    <?php
         }
-  ?>
-    <div class="reward-card">
-      <img src="<?php echo htmlspecialchars($src); ?>" alt="<?php echo htmlspecialchars($reward['rewardName']); ?>">
-      <div class="reward-name"><?php echo htmlspecialchars($reward['rewardName']); ?></div>
-      <div class="reward-points"><?php echo htmlspecialchars($reward['pointsRequired']); ?> pts</div>
-      <button class="claim-btn <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? 'available' : 'insufficient'; ?>"
-        <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? '' : 'disabled'; ?>>
-        <?php echo ($totalCurrentPoints >= $reward['pointsRequired']) ? 'Claim' : 'Insufficient points'; ?>
-      </button>
-    </div>
-  <?php
       }
-    }
-    // Add "coming soon" placeholders
-    for ($i = $rewardCount; $i < $maxCards; $i++) {
-  ?>
-    <div class="reward-card coming-soon">
-      <img src="images/default-reward.png" alt="Coming Soon">
-      <div class="reward-name">coming soon</div>
-    </div>
-  <?php } ?>
-</div>
+      for ($i = $rewardCount; $i < $maxCards; $i++) {
+    ?>
+      <div class="reward-card coming-soon">
+        <img src="images/coming-soon.png" alt="Coming Soon">
+        <div class="reward-name">coming soon</div>
+      </div>
+    <?php } ?>
+  </div>
+
 </body>
 </html>

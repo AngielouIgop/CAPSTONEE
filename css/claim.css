@@ -1,120 +1,105 @@
 body {
-  background: #bfc8e6;
+  background-color: #fdeeee;
   font-family: 'Segoe UI', Arial, sans-serif;
   margin: 0;
-  padding: 0;
-  padding-top: 100px;
-  padding-left: 220px;
+  padding: 100px 40px 40px 220px;
+  box-sizing: border-box;
 }
 
 .rewards-header {
   display: flex;
-  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  max-width: 1000px;
   margin: 0 auto;
-  margin-bottom: 1rem;
+  padding: 10px;
 }
 
-.rewards-header span:first-child {
-  font-size: 1.5rem;
+.rewards-header span {
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  color: #000;
 }
 
-.rewards-header span:last-child {
-  font-size: 1.2rem;
-  font-weight: 400;
-  color: #666;
+.rewards-header span b {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000;
 }
 
 .rewards-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
   justify-content: center;
-  background: #fbeeee;
-  border-radius: 0 0 12px 12px;
-  max-width: 1500px;
-  margin: 0 auto 40px auto;
-  padding-top: 100px;
-  padding: 40px 30px 30px 30px;
-  min-height: 400px;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 30px auto;
 }
 
 .reward-card {
-  justify-content: center;
+  width: 180px;
   background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  width: 170px;
-  min-height: 220px;
-  padding: 1.2rem 1rem 1rem 1rem;
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 15px;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: box-shadow 0.2s, border 0.2s;
-  position: relative;
 }
 
 .reward-card img {
   width: 100px;
   height: 100px;
   object-fit: contain;
-  margin-bottom: 0.7rem;
-  border-radius: 8px;
-  background: #f0f0f0;
+  margin-bottom: 10px;
+  border-radius: 12px;
 }
 
 .reward-name {
-  font-size: 1.1rem;
+  font-size: 15px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 0.2rem;
-  text-align: center;
+  color: #222;
+  margin-bottom: 5px;
 }
 
 .reward-points {
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 0.7rem;
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 10px;
 }
 
 .claim-btn {
-  background: #e0e0e0;
-  color: #222;
   border: none;
-  border-radius: 12px;
-  padding: 0.4em 1.2em;
-  font-size: 1rem;
+  border-radius: 20px;
+  padding: 6px 20px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 0.2rem;
-  transition: background 0.2s;
+  transition: 0.2s;
 }
 
 .claim-btn.available {
-  background: #2336b6;
+  background-color: #000;
   color: #fff;
 }
 
 .claim-btn.available:hover {
-  background: #1a237e;
+  background-color: #222;
 }
 
 .claim-btn.insufficient {
-  background: #e0e0e0;
-  color: #888;
+  background-color: #e0e0e0;
+  color: #777;
   cursor: not-allowed;
 }
 
 .reward-card.coming-soon {
-  opacity: 0.5;
-  background: #f0f0f0;
-  border: 2px dashed #ccc;
+  background-color: #eee;
+  opacity: 0.7;
 }
 
 .reward-card.coming-soon .reward-name {
-  color: #aaa;
+  color: #888;
   font-style: italic;
 }

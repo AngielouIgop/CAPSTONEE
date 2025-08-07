@@ -4,72 +4,23 @@ body, html {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f8f9fa;
     height: 100%;
-    padding-top: 20px;
+    padding-top: 15px;
   }
   
-  .sidebar {
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 250px;
-    background-color: rgb(0, 48, 96);
-    color: #fff;
-    padding-top: 60px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .sidebar-title {
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 1.5em;
-    letter-spacing: 1px;
-  }
-  
-  .nav-links {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .sidebar a {
-    color: #fff;
-    text-decoration: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    transition: background 0.2s;
-    font-size: 1.1em;
-  }
-  
-  .sidebar a:hover {
-    background-color: #495057;
-  }
-  
-  .logout-link {
-    margin-bottom: 40px;
-    padding: 0 20px;
-  }
-  
-  .logout-link a {
-    display: block;
-    width: 100%;
-    text-align: center;
-    background: #c0392b;
-    color: #fff;
-    border-radius: 5px;
-    padding: 10px 0;
-    font-weight: bold;
-    transition: background 0.2s;
-  }
-  
-  .logout-link a:hover {
-    background-color: #a93226;
-  }
-  
+.summary-cards {
+  margin-top: 100px;
+  margin-left: 300px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
   .content {
-    margin-left: 270px;
+    margin-left: 250px;
     padding: 40px 30px;
   }
   
@@ -83,13 +34,14 @@ body, html {
     display: flex;
     gap: 30px;
     flex-wrap: wrap;
+
   }
   
   .card {
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-    padding: 24px 20px;
+    padding: 12px 8px;
     width: 300px;
     display: flex;
     flex-direction: column;
@@ -99,7 +51,7 @@ body, html {
   .card-body {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
   }
   
   .card-title {
@@ -132,6 +84,32 @@ body, html {
   .btn-primary:hover {
     background: #003366;
   }
+  
+
+  #calendar {
+  margin-top: 20px;
+}
+
+#calendar table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#calendar th, #calendar td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+#calendar th {
+  background-color: #f0f0f0;
+}
+
+#calendar td.today {
+  background-color: #07008a;
+  color: #fff;
+  font-weight: bold;
+}
   
   @media (max-width: 900px) {
     .sidebar {
