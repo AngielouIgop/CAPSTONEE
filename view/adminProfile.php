@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,11 +16,27 @@
       }
     }
   </script>
+  <style>
+    .password-container {
+      display: flex;
+      align-items: center;
+    }
+    .password-container input {
+      flex: 1;
+    }
+    .password-toggle {
+      margin-left: 0.5rem;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
   <form class="profile-form" method="post" enctype="multipart/form-data" action="?command=updateProfileSettings">
     <h2 class="profile-form-title">Admin Profile Info</h2>
+
     <div class="profile-form-top">
       <div class="profile-img-box">
         <?php
@@ -44,10 +59,9 @@
           <input type="file" name="profilePicture" accept="image/*" style="display:none;"
             onchange="imagePreview(event)">
         </label>
-        <?php if (!empty($admin['profilePicture'])): ?>
-        <?php endif; ?>
       </div>
     </div>
+
     <div class="profile-form-fields">
       <div class="form-row">
         <div class="form-group">
@@ -59,30 +73,50 @@
           <input type="email" name="email" value="<?php echo htmlspecialchars($admin['email'] ?? ''); ?>">
         </div>
       </div>
+
       <div class="form-row">
         <div class="form-group">
           <label>Contact Number</label>
-          <input type="text" name="contactNumber"
-            value="<?php echo htmlspecialchars($admin['contactNumber'] ?? ''); ?>">
+          <input type="text" name="contactNumber" value="<?php echo htmlspecialchars($admin['contactNumber'] ?? ''); ?>">
         </div>
         <div class="form-group">
           <label>Username</label>
           <input type="text" name="username" value="<?php echo htmlspecialchars($admin['username'] ?? ''); ?>">
         </div>
       </div>
+
       <div class="form-row">
         <div class="form-group">
           <label>Password</label>
-          <input type="password" name="password" placeholder="Enter new password">
+          <div class="password-container">
+            <input type="password" id="password" name="password" placeholder="Enter new password">
+            <button type="button" class="password-toggle" onclick="togglePassword('password', this)">Show</button>
+          </div>
         </div>
         <div class="form-group">
           <label>Confirm password</label>
-          <input type="password" name="confirmPassword">
+          <div class="password-container">
+            <input type="password" id="confirmPassword" name="confirmPassword">
+            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', this)">Show</button>
+          </div>
         </div>
       </div>
     </div>
+
     <button type="submit" class="save-btn">Confirm and Save</button>
   </form>
-</body>
 
+  <script>
+    function togglePassword(inputId, toggleBtn) {
+      const input = document.getElementById(inputId);
+      if (input.type === "password") {
+        input.type = "text";
+        toggleBtn.textContent = "Hide";
+      } else {
+        input.type = "password";
+        toggleBtn.textContent = "Show";
+      }
+    }
+  </script>
+</body>
 </html>

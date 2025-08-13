@@ -41,13 +41,14 @@ body {
     color: #fff;
   }
   
-  .profile-form-top {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-    justify-content: center;
-  }
+ .profile-form-top {
+  display: flex;
+  flex-direction: column; /* stack image and button vertically */
+  align-items: center;
+  gap: 0.8rem; /* space between image and button */
+  margin-bottom: 1.5rem;
+}
+
   
   .profile-img-box {
     width: 300px;

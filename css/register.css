@@ -22,9 +22,10 @@ body, html {
 }
 
 .logo {
-  width: 500px; /* adjust the width to your desired size */
-  height: 500px; /* adjust the height to your desired size */
-  margin-bottom: none; /* adjust the margin to your desired distance */
+  width: 550px; /* adjust the width to your desired size */
+  height: 550px; /* adjust the height to your desired size */
+  margin-bottom: 5px; /* adjust the margin to your desired distance */
+  filter: drop-shadow(10px 10px 15px rgba(0, 0, 0, 0.5));
 }
 
 .logo-side h1 {
@@ -114,6 +115,35 @@ body, html {
 .login-link a {
   color: rgb(0, 48, 96);
   text-decoration: underline;
+}
+
+/* Password toggle styles */
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.password-toggle {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  padding: 5px;
+}
+
+.password-toggle:hover {
+  color: #333;
+}
+
+.password-container input[type="password"],
+.password-container input[type="text"] {
+  padding-right: 40px;
 }
 
 @media (max-width: 900px) {

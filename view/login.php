@@ -24,6 +24,7 @@
         <select id="loginRole" name="loginRole" required onchange="toggleLoginType()">
           <option value="user">User</option>
           <option value="admin">Admin</option>
+          <option value="super admin">Super Admin</option>
         </select>
         <label for="username">Username</label>
         <input type="text" id="username" name="username" required>

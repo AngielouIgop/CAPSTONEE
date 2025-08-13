@@ -80,8 +80,9 @@
         </table>
     </div>
 </body>
-<!-- Edit User Details Modal -->
 
+
+<!-- Edit User Details Modal -->
 <div id="editUserModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -106,14 +107,17 @@
             <input type="text" id="edit-username" name="username" required>
 
             <label for="edit-password">Password</label>
-            <input type="password" id="edit-password" name="password">
+            <div class="password-container">
+                <input type="password" id="edit-password" name="password">
+                <button type="button" class="password-toggle" onclick="togglePassword('edit-password', this)">Show</button>
+            </div>
             <small>Leave blank to keep current password</small>
 
             <label for="edit-confirmPassword">Confirm Password</label>
-            <input type="password" id="edit-confirmPassword" name="confirmPassword">
-
-            <!-- <label for="edit-profilePicture">Profile Picture</label>
-            <input type="file" id="edit-profilePicture" name="profilePicture" accept="image/*"> -->
+            <div class="password-container">
+                <input type="password" id="edit-confirmPassword" name="confirmPassword">
+                <button type="button" class="password-toggle" onclick="togglePassword('edit-confirmPassword', this)">Show</button>
+            </div>
 
             <div class="modal-buttons">
                 <button type="submit" class="btn-confirm">Confirm</button>
@@ -124,7 +128,6 @@
 </div>
 
 <!-- Add an Administrator Modal -->
-
 <div id="addAdministratorModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -149,11 +152,16 @@
             <input type="text" id="add-username" name="username" required>
 
             <label for="add-password">Password</label>
-            <input type="password" id="add-password" name="password">
-            <small>Leave blank to keep current password</small>
+            <div class="password-container">
+                <input type="password" id="add-password" name="password">
+                <button type="button" class="password-toggle" onclick="togglePassword('add-password', this)">Show</button>
+            </div>
 
             <label for="add-confirmPassword">Confirm Password</label>
-            <input type="password" id="add-confirmPassword" name="confirmPassword">
+            <div class="password-container">
+                <input type="password" id="add-confirmPassword" name="confirmPassword">
+                <button type="button" class="password-toggle" onclick="togglePassword('add-confirmPassword', this)">Show</button>
+            </div>
 
             <label for="add-profilePicture">Profile Picture</label>
             <input type="file" id="add-profilePicture" name="profilePicture" accept="image/*">
@@ -165,6 +173,23 @@
         </form>
     </div>
 </div>
+
+<script>
+function togglePassword(inputId, toggleBtn) {
+    const passwordInput = document.getElementById(inputId);
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleBtn.textContent = 'Hide';
+        toggleBtn.title = 'Hide password';
+    } else {
+        passwordInput.type = 'password';
+        toggleBtn.textContent = 'Show';
+        toggleBtn.title = 'Show password';
+    }
+}
+</script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

@@ -26,7 +26,7 @@
       </li>
     </ul>
   </nav>
-  <?php elseif (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin'): ?>
+  <?php elseif (isset($_SESSION['user']['role']) && ($_SESSION['user']['role'] === 'admin' || $_SESSION['user']['role'] === 'super admin')): ?>
   <nav class="header-nav">
     <ul>
       <li>
@@ -39,7 +39,7 @@
 
 
 <?php
-if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
+if (isset($_SESSION['user']) && ($_SESSION['user']['role'] === 'admin' || $_SESSION['user']['role'] === 'super admin')) {
     // Admin sidebar
     ?>
     <div class="sidebar">

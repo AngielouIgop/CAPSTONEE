@@ -34,7 +34,7 @@ class Controller
                 $zone = $_POST['zone'] ?? '';
                 $error = '';
 
-                // Common validation
+                // Validate if the necessary fields are filled
                 if (empty($fullname) || empty($email) || empty($username) || empty($password) || empty($confirm) || empty($contactNumber) || empty($zone)) {
                     $error = "Please fill out all the required fields.";
                 } elseif ($password !== $confirm) {
@@ -329,6 +329,13 @@ class Controller
                 break;
 
             case 'addAdministrator':
+
+                if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'super admin') {
+                    echo "<script>alert('Access denied. Only Super Admin can add an administrator.');
+                    window.location.href='?command=manageUser';</script>";
+                    exit();
+                }
+
                 $fullname = $_POST['fullname'] ?? '';
                 $email = $_POST['email'] ?? '';
                 $contactNumber = $_POST['contactNumber'] ?? '';
@@ -347,7 +354,7 @@ class Controller
                     $error = "Username already exists.";
                 } else {
                     // Register admin (position is passed as the 'zone' parameter)
-                    $success = $this->model->registerUser($fullname, $email, $position, $contactNumber, $username, $password, 'admin');
+                    $success = $this->model->addAdministrator($fullname, $email, $position, $contactNumber, $username, $password, 'admin');
                     if ($success) {
                         echo "<script>alert('Administrator added successfully.'); window.location.href='?command=manageUser';</script>";
                         exit();

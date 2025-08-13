@@ -19,17 +19,19 @@ body, html {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 25px;
 }
 
 .logo-side img {
-  width: 500px; /* adjust the width to your desired size */
-  height: 500px; /* adjust the height to your desired size */
-  margin-bottom: none; /* adjust the margin to your desired distance */
+  width: 550px; 
+  height: 550px; 
+  margin-bottom: none; 
+  filter: drop-shadow(10px 10px 15px rgba(0, 0, 0, 0.5));
 }
 
 .logo-side h2 {
-  margin-top: 0; /* remove the default margin */
+  margin-top: 0; 
+  /* filter: drop-shadow(10px 10px 15px rgba(0,0,0,0.5)); */
 }
 
 .form-side {
