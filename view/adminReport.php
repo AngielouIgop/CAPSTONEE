@@ -2,57 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reports</title>
   <link rel="stylesheet" href="css/adminReport.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="report-container">
     <h1 class="report-title">Reports</h1>
 
-    <!-- Top Summary Cards -->
+    <!-- Summary Cards -->
     <div class="summary-cards">
       <div class="card">
         <img src="images/plasticBottle.png" alt="Plastic Bottles">
-        <p>Total Contributions</p>
+        <p>Total Plastic</p>
         <h2><?= htmlspecialchars($totalPlastic) ?></h2>
       </div>
       <div class="card">
         <img src="images/tincan.png" alt="Tin Cans">
-        <p>Total Contributions</p>
+        <p>Total Cans</p>
         <h2><?= htmlspecialchars($totalCans) ?></h2>
       </div>
       <div class="card">
         <img src="images/glassBottle.png" alt="Glass Bottles">
-        <p>Total Contributions</p>
-        <h2><?= htmlspecialchars($totalGlassBottles) ?></h2>
+        <p>Total Bottles</p>
+        <h2><?= htmlspecialchars($totalBottles) ?></h2>
       </div>
-    <div class="date-picker">
-    <span>📅 Filter by date:</span>
-    <input type="date" id="date-filter" value="<?= date('Y-m-d') ?>">
-    <button id="apply-filter">Apply</button>
-    </div>
+      <div class="date-picker">
+        <span>📅 Filter by date:</span>
+        <input type="date" id="date-filter" value="<?= date('Y-m-d') ?>">
+        <button id="apply-filter">Apply</button>
+      </div>
     </div>
 
-    <!-- Main Content Area -->
+    <!-- Main Reports -->
     <div class="main-reports">
-
-      <!-- Graph Section -->
+      <!-- Graph -->
       <div class="contribution-graph">
-        <h3>Contributions this month</h3>
-        <div class="total-waste"><?= htmlspecialchars($totalWasteContributions) ?> Waste</div>
+        <h3>Contributions per Material (This Month)</h3>
         <canvas id="contributionChart"></canvas>
       </div>
 
-      <!-- Leading Zones (Placeholder Static for Now) -->
-        <div class="leading-zones">
-    <h3>Leading Zones</h3>
+      <!-- Leading Zones -->
+    <div class="leading-zones">
+    <h3>Total Contributions per Zone</h3>
     <ul>
-        <?php foreach ($contPerZone as $zone) { ?>
-        <li><strong>Zone <?= $zone['zone'] ?></strong><span><?= $zone['totalContributions'] ?> total contributions</span></li>
-        <?php } ?>
+        <li><strong>Zone 1</strong> <span><?= htmlspecialchars($getContZone1) ?> total contributions</span></li>
+        <li><strong>Zone 2</strong> <span><?= htmlspecialchars($getContZone2) ?> total contributions</span></li>
+        <li><strong>Zone 3</strong> <span><?= htmlspecialchars($getContZone3) ?> total contributions</span></li>
+        <li><strong>Zone 4</strong> <span><?= htmlspecialchars($getContZone4) ?> total contributions</span></li>
+        <li><strong>Zone 5</strong> <span><?= htmlspecialchars($getContZone5) ?> total contributions</span></li>
+        <li><strong>Zone 6</strong> <span><?= htmlspecialchars($getContZone6) ?> total contributions</span></li>
+        <li><strong>Zone 7</strong> <span><?= htmlspecialchars($getContZone7) ?> total contributions</span></li>
     </ul>
-    </div>
+</div>
+
 
       <!-- Top Contributors Table -->
       <div class="top-contributors">
@@ -70,27 +74,32 @@
           <tbody>
             <?php foreach ($users as $user): ?>
               <?php
-                // Filter total contributed items from $wasteHistory
-                $userTotal = [
-                  'Plastic' => 0,
-                  'Bottles' => 0,
-                  'Cans' => 0
-                ];
-                $totalPoints = 0;
-                foreach ($wasteHistory as $entry) {
-                  if ($entry['fullName'] === $user['fullName']) {
-                    $material = $entry['materialName'];
-                    $userTotal[$material] = ($userTotal[$material] ?? 0) + $entry['quantity'];
-                    $totalPoints += $entry['pointsEarned'];
+              $nameMap = [
+                'Plastic' => 'Plastic Bottles',
+                'Plastic Bottles' => 'Plastic Bottles',
+                'Glass' => 'Glass Bottles',
+                'Glass Bottles' => 'Glass Bottles',
+                'Cans' => 'Cans',
+                'Tin Cans' => 'Cans'
+              ];
+              $userTotal = ['Plastic Bottles' => 0, 'Glass Bottles' => 0, 'Cans' => 0];
+              $totalPoints = 0;
+              foreach ($wasteHistory as $entry) {
+                if ($entry['fullName'] === $user['fullName']) {
+                  $materialKey = $nameMap[$entry['materialName']] ?? null;
+                  if ($materialKey) {
+                    $userTotal[$materialKey] += $entry['quantity'];
                   }
+                  $totalPoints += $entry['pointsEarned'];
                 }
+              }
               ?>
               <tr>
                 <td><?= htmlspecialchars($user['fullName']) ?></td>
                 <td><?= htmlspecialchars($user['zone']) ?></td>
                 <td>
                   <?php foreach ($userTotal as $type => $count): ?>
-                    <?= htmlspecialchars($type) ?> <?= $count ?><br/>
+                    <?= htmlspecialchars($type) ?>: <?= $count ?><br />
                   <?php endforeach; ?>
                 </td>
                 <td><?= $totalPoints ?> pts</td>
@@ -102,42 +111,37 @@
     </div>
   </div>
 
-  <script src="[https://cdn.jsdelivr.net/npm/chart.js"></script>](https://cdn.jsdelivr.net/npm/chart.js"></script>)
+  <!-- Chart.js Script -->
   <script>
-    document.getElementById('apply-filter').addEventListener('click', function() {
-      var dateFilter = document.getElementById('date-filter').value;
-      $.ajax({
-        type: 'POST',
-        url: 'php/chartdata.php',
-        data: {date: dateFilter},
-        success: function(data) {
-          const ctx = document.getElementById('contributionChart').getContext('2d');
-          const startDate = new Date(Date.parse(dateFilter));
-          const endDate = new Date(startDate.getTime() + 28 * 24 * 60 * 60 * 1000);
+    document.addEventListener("DOMContentLoaded", function() {
+        const wastePerMaterial = <?= json_encode($wastePerMaterial) ?>;
+        const labels = wastePerMaterial.map(item => item.materialType);
+        const dataValues = wastePerMaterial.map(item => item.totalQuantity);
+
         const ctx = document.getElementById('contributionChart').getContext('2d');
-        const chart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-            datasets: [{
-              label: 'Waste',
-              data: data, // Update the data with the response from the server
-              borderColor: '#333',
-              backgroundColor: '#fbb',
-              fill: false,
-              tension: 0.3,
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { display: false }
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Quantity',
+                    data: dataValues,
+                    backgroundColor: ['#4cafef', '#81c784', '#ffb74d'],
+                    borderColor: ['#1e88e5', '#388e3c', '#f57c00'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
             }
-          }
         });
-      }
     });
-  });
-</script>
+  </script>
 </body>
 </html>

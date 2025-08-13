@@ -108,10 +108,9 @@
 
             <label for="edit-password">Password</label>
             <div class="password-container">
-                <input type="password" id="edit-password" name="password">
+                <input type="password" id="edit-password" name="password"> <small>Leave blank to keep current password</small>
                 <button type="button" class="password-toggle" onclick="togglePassword('edit-password', this)">Show</button>
             </div>
-            <small>Leave blank to keep current password</small>
 
             <label for="edit-confirmPassword">Confirm Password</label>
             <div class="password-container">

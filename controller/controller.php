@@ -502,21 +502,31 @@ class Controller
 
 
             case 'adminReport':
-                if (isset($_POST['date'])) {
-                    // $dateFilter = $_POST['date'];
-                    $data = $this->model->getContributionData($_POST['date']); // Retrieve the updated data
-                    echo json_encode($data); // Return the data as a JSON response
-                    exit;
-                }
-                $wasteHistory = $this->model->getTotalWasteHistory();
-                $totalWasteContributions = $this->model->getTotalWasteContributions();
-                $totalPlastic = $this->model->getTotalPlasticCont();
-                $totalCans = $this->model->getTotalCansCont();
-                $totalGlassBottles = $this->model->getTotalGlassBottlesCont();
+
+                $userID = $_SESSION['userID'];
+                $totalCans = $this->model->getTotalCans();
+                $totalBottles = $this->model->getTotalBottles();
+                $totalPlastic = $this->model->getTotalPlastic();
+
+                // Get per material contributions for current month
+                $wastePerMaterial = $this->model->getWasteContributionsPerMaterialThisMonth();
+
+                // Get leading zones & users
+                $getContZone1 = $this->model->getContZone1();
+                $getContZone2 = $this->model->getContZone2();
+                $getContZone3 = $this->model->getContZone3();
+                $getContZone4 = $this->model->getContZone4();
+                $getContZone5 = $this->model->getContZone5();
+                $getContZone6 = $this->model->getContZone6();
+                $getContZone7 = $this->model->getContZone7();
+                // $contPerZone = $this->model->getContributionsPerZone();
                 $users = $this->model->getAllUsers();
-                $contPerZone = $this->model->getTotalWasteContributionsPerZone();
+                $wasteHistory = $this->model->getWasteHistory();
+
                 include_once('view/adminReport.php');
                 break;
+
+
 
             case 'logout':
                 session_unset();

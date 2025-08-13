@@ -14,6 +14,7 @@ body {
   background: #fbeeee;
   padding: 8px 16px;
   border-radius: 8px 8px 0 0;
+  margin-left: 15rem;
 }
 
 .table-container {
@@ -279,7 +280,7 @@ body {
 }
 
 #addAdministratorModal .btn-confirm {
-    background-color: #4CAF50;
+    background-color: #331bcf;
     color: #fff;
     border: none;
     padding: 10px 22px;
@@ -289,7 +290,7 @@ body {
     transition: background 0.2s;
 }
 #addAdministratorModal .btn-confirm:hover {
-    background-color: #388e3c;
+    background-color: #221172;
 }
 
 #addAdministratorModal .btn-cancel {
@@ -304,6 +305,20 @@ body {
 }
 #addAdministratorModal .btn-cancel:hover {
     background-color: #b71c1c;
+}
+
+.password-toggle {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  padding: 5px;
+}
+
+.password-toggle:hover {
+  color: #333;
 }
 
 @media (max-width: 800px) {
