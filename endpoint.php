@@ -30,12 +30,12 @@ class Endpoint {
         error_log("POST data: " . print_r($_POST, true));
 
         $material = $_POST['material'] ?? '';
-        $weight = $_POST['weight'] ?? '';
+        $weight = isset($_POST['weight']) ? floatval($_POST['weight']) : 0.0;
         $dateDeposited = date('Y-m-d');
         $timeDeposited = date('H:i:s');
         $userID = $_POST['userID'] ?? '';
 
-        if (empty($material) || empty($weight) || empty($userID)) {
+        if (empty($material) || !isset($_POST['weight']) || empty($userID)) {
             error_log("Missing required fields");
             http_response_code(400);
             echo json_encode(["error" => "Missing required fields"]);
@@ -71,10 +71,10 @@ class Endpoint {
             error_log("Points earned: $pointsEarned");
 
             // Insert waste entry
-            $sql = "INSERT INTO wasteEntry (userID, materialID, quantity, pointsEarned, dateDeposited, timeDeposited)
-                    VALUES (?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO wasteEntry (userID, materialID, quantity, pointsEarned, dateDeposited, timeDeposited, materialWeight)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->model->db->prepare($sql);
-            $stmt->bind_param("iiisss", $userID, $materialID, $quantity, $pointsEarned, $dateDeposited, $timeDeposited);
+            $stmt->bind_param("iiisssd", $userID, $materialID, $quantity, $pointsEarned, $dateDeposited, $timeDeposited, $weight);
 
             if ($stmt->execute()) {
                 echo json_encode(["success" => true, "message" => "Material inserted. Points: $pointsEarned"]);
